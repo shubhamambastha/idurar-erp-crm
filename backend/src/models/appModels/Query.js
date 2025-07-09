@@ -1,0 +1,63 @@
+const mongoose = require('mongoose');
+
+const noteSchema = new mongoose.Schema({
+  content: {
+    type: String,
+    required: true,
+  },
+  createdBy: { type: mongoose.Schema.ObjectId, ref: 'Admin', autopopulate: true },
+  created: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
+const querySchema = new mongoose.Schema({
+  removed: {
+    type: Boolean,
+    default: false,
+  },
+  enabled: {
+    type: Boolean,
+    default: true,
+  },
+  customer: {
+    type: mongoose.Schema.ObjectId,
+    ref: 'Client',
+    required: true,
+    autopopulate: true,
+  },
+  description: {
+    type: String,
+    required: true,
+  },
+  status: {
+    type: String,
+    enum: ['Open', 'InProgress', 'Closed'],
+    default: 'Open',
+  },
+  resolution: {
+    type: String,
+    default: '',
+  },
+  priority: {
+    type: String,
+    enum: ['Low', 'Medium', 'High'],
+    default: 'Medium',
+  },
+  notes: [noteSchema],
+  createdBy: { type: mongoose.Schema.ObjectId, ref: 'Admin', autopopulate: true },
+  assigned: { type: mongoose.Schema.ObjectId, ref: 'Admin', autopopulate: true },
+  created: {
+    type: Date,
+    default: Date.now,
+  },
+  updated: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
+querySchema.plugin(require('mongoose-autopopulate'));
+
+module.exports = mongoose.model('Query', querySchema);
