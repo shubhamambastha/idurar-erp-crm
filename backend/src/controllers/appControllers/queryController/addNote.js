@@ -1,8 +1,4 @@
-const mongoose = require('mongoose');
-
-const Model = mongoose.model('Query');
-
-const addNote = async (req, res) => {
+const addNote = async (Model, req, res) => {
   const { id } = req.params;
   const { content } = req.body;
 
@@ -26,7 +22,6 @@ const addNote = async (req, res) => {
 
     const newNote = {
       content: content.trim(),
-      createdBy: req.admin._id,
       created: new Date(),
     };
 
@@ -34,9 +29,6 @@ const addNote = async (req, res) => {
     query.updated = new Date();
 
     await query.save();
-
-    // Populate the response
-    await query.populate('notes.createdBy', 'name email');
 
     return res.status(200).json({
       success: true,

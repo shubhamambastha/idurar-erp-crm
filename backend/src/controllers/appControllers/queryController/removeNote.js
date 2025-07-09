@@ -1,8 +1,4 @@
-const mongoose = require('mongoose');
-
-const Model = mongoose.model('Query');
-
-const removeNote = async (req, res) => {
+const removeNote = async (Model, req, res) => {
   const { id, noteId } = req.params;
 
   try {
