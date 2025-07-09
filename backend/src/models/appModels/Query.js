@@ -5,7 +5,6 @@ const noteSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  createdBy: { type: mongoose.Schema.ObjectId, ref: 'Admin', autopopulate: true },
   created: {
     type: Date,
     default: Date.now,
@@ -40,14 +39,7 @@ const querySchema = new mongoose.Schema({
     type: String,
     default: '',
   },
-  priority: {
-    type: String,
-    enum: ['Low', 'Medium', 'High'],
-    default: 'Medium',
-  },
   notes: [noteSchema],
-  createdBy: { type: mongoose.Schema.ObjectId, ref: 'Admin', autopopulate: true },
-  assigned: { type: mongoose.Schema.ObjectId, ref: 'Admin', autopopulate: true },
   created: {
     type: Date,
     default: Date.now,
