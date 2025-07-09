@@ -68,6 +68,9 @@ const quoteSchema = new mongoose.Schema({
         type: Number,
         required: true,
       },
+      notes: {
+        type: String,
+      },
     },
   ],
   taxRate: {
