@@ -27,7 +27,7 @@ export default function QueryNotesModal({ open, onClose, query }) {
     setLoading(true);
     try {
       const result = await request.read({
-        entity: 'query',
+        entity: 'queries',
         id: query._id,
       });
 
@@ -52,7 +52,7 @@ export default function QueryNotesModal({ open, onClose, query }) {
     setAddingNote(true);
     try {
       const result = await request.post({
-        entity: `query/${query._id}/notes`,
+        entity: `queries/${query._id}/notes`,
         jsonData: {
           content: noteContent.trim(),
         },
@@ -73,7 +73,7 @@ export default function QueryNotesModal({ open, onClose, query }) {
   const handleDeleteNote = async (noteId) => {
     try {
       // Use axios directly for DELETE request to custom route
-      const response = await axios.delete(`${API_BASE_URL}query/${query._id}/notes/${noteId}`, {
+      const response = await axios.delete(`${API_BASE_URL}queries/${query._id}/notes/${noteId}`, {
         withCredentials: true,
       });
 

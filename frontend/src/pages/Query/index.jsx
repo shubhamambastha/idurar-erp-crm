@@ -11,7 +11,7 @@ import QueryNotesModal from '@/modules/QueryModule/QueryNotesModal';
 export default function Query() {
   const translate = useLanguage();
   const { dateFormat } = useDate();
-  const entity = 'query';
+  const entity = 'queries';
   const [notesModalOpen, setNotesModalOpen] = useState(false);
   const [selectedQuery, setSelectedQuery] = useState(null);
 
