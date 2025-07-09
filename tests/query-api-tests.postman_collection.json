@@ -1,0 +1,385 @@
+{
+  "info": {
+    "name": "Query Management API Tests",
+    "description": "API tests for Query Management Module",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8888",
+      "type": "string"
+    },
+    {
+      "key": "queryId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "noteId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "customerId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{authToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Test 1: Get All Queries with Pagination",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/query/list?page=1&limit=10",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "queries", "list"],
+          "query": [
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "limit",
+              "value": "10"
+            }
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Response has success property', function () {",
+              "    const responseJson = pm.response.json();",
+              "    pm.expect(responseJson).to.have.property('success');",
+              "    pm.expect(responseJson.success).to.be.true;",
+              "});",
+              "",
+              "pm.test('Response has pagination', function () {",
+              "    const responseJson = pm.response.json();",
+              "    pm.expect(responseJson).to.have.property('pagination');",
+              "    pm.expect(responseJson.pagination).to.have.property('current');",
+              "    pm.expect(responseJson.pagination).to.have.property('pageSize');",
+              "    pm.expect(responseJson.pagination).to.have.property('total');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Test 2: Create New Query",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"customer\": \"{{customerId}}\",\n  \"description\": \"Test query description for API testing\",\n  \"status\": \"Open\",\n  \"priority\": \"High\",\n  \"resolution\": \"\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/query/create",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "queries", "create"]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Query created successfully', function () {",
+              "    const responseJson = pm.response.json();",
+              "    pm.expect(responseJson).to.have.property('success');",
+              "    pm.expect(responseJson.success).to.be.true;",
+              "    pm.expect(responseJson).to.have.property('result');",
+              "    pm.expect(responseJson.result).to.have.property('_id');",
+              "    ",
+              "    // Save query ID for subsequent tests",
+              "    pm.collectionVariables.set('queryId', responseJson.result._id);",
+              "});",
+              "",
+              "pm.test('Query has correct properties', function () {",
+              "    const responseJson = pm.response.json();",
+              "    const query = responseJson.result;",
+              "    pm.expect(query).to.have.property('description');",
+              "    pm.expect(query).to.have.property('status');",
+              "    pm.expect(query).to.have.property('priority');",
+              "    pm.expect(query.status).to.equal('Open');",
+              "    pm.expect(query.priority).to.equal('High');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Test 3: Get Query by ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/query/read/{{queryId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "queries", "read", "{{queryId}}"]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Query retrieved successfully', function () {",
+              "    const responseJson = pm.response.json();",
+              "    pm.expect(responseJson).to.have.property('success');",
+              "    pm.expect(responseJson.success).to.be.true;",
+              "    pm.expect(responseJson).to.have.property('result');",
+              "    pm.expect(responseJson.result).to.have.property('_id');",
+              "    pm.expect(responseJson.result._id).to.equal(pm.collectionVariables.get('queryId'));",
+              "});",
+              "",
+              "pm.test('Query has populated customer', function () {",
+              "    const responseJson = pm.response.json();",
+              "    const query = responseJson.result;",
+              "    pm.expect(query).to.have.property('customer');",
+              "    pm.expect(query.customer).to.have.property('name');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Test 4: Update Query Status",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"InProgress\",\n  \"resolution\": \"Started working on the query\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/query/update/{{queryId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "queries", "update", "{{queryId}}"]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Query updated successfully', function () {",
+              "    const responseJson = pm.response.json();",
+              "    pm.expect(responseJson).to.have.property('success');",
+              "    pm.expect(responseJson.success).to.be.true;",
+              "    pm.expect(responseJson).to.have.property('result');",
+              "});",
+              "",
+              "pm.test('Query status changed to InProgress', function () {",
+              "    const responseJson = pm.response.json();",
+              "    const query = responseJson.result;",
+              "    pm.expect(query.status).to.equal('InProgress');",
+              "    pm.expect(query.resolution).to.equal('Started working on the query');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Test 5: Add Note to Query",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"content\": \"This is a test note for the query\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/query/{{queryId}}/notes",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "queries", "{{queryId}}", "notes"]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Note added successfully', function () {",
+              "    const responseJson = pm.response.json();",
+              "    pm.expect(responseJson).to.have.property('success');",
+              "    pm.expect(responseJson.success).to.be.true;",
+              "    pm.expect(responseJson).to.have.property('result');",
+              "});",
+              "",
+              "pm.test('Query has notes array with new note', function () {",
+              "    const responseJson = pm.response.json();",
+              "    const query = responseJson.result;",
+              "    pm.expect(query).to.have.property('notes');",
+              "    pm.expect(query.notes).to.be.an('array');",
+              "    pm.expect(query.notes.length).to.be.greaterThan(0);",
+              "    ",
+              "    const lastNote = query.notes[query.notes.length - 1];",
+              "    pm.expect(lastNote).to.have.property('content');",
+              "    pm.expect(lastNote.content).to.equal('This is a test note for the query');",
+              "    ",
+              "    // Save note ID for deletion test",
+              "    pm.collectionVariables.set('noteId', lastNote._id);",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Test 6: Filter Queries by Status",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/query/list?status=Open&page=1&limit=10",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "queries", "list"],
+          "query": [
+            {
+              "key": "status",
+              "value": "Open"
+            },
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "limit",
+              "value": "10"
+            }
+          ]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Filtered queries returned', function () {",
+              "    const responseJson = pm.response.json();",
+              "    pm.expect(responseJson).to.have.property('success');",
+              "    pm.expect(responseJson.success).to.be.true;",
+              "    pm.expect(responseJson).to.have.property('result');",
+              "    pm.expect(responseJson.result).to.be.an('array');",
+              "});",
+              "",
+              "pm.test('All returned queries have Open status', function () {",
+              "    const responseJson = pm.response.json();",
+              "    const queries = responseJson.result;",
+              "    ",
+              "    queries.forEach(query => {",
+              "        pm.expect(query.status).to.equal('Open');",
+              "    });",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Test 7: Delete Note from Query",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/query/{{queryId}}/notes/{{noteId}}",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "queries", "{{queryId}}", "notes", "{{noteId}}"]
+        }
+      },
+      "response": [],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Status code is 200', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "",
+              "pm.test('Note deleted successfully', function () {",
+              "    const responseJson = pm.response.json();",
+              "    pm.expect(responseJson).to.have.property('success');",
+              "    pm.expect(responseJson.success).to.be.true;",
+              "    pm.expect(responseJson).to.have.property('result');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    }
+  ]
+}
