@@ -52,4 +52,4 @@ const querySchema = new mongoose.Schema({
 
 querySchema.plugin(require('mongoose-autopopulate'));
 
-module.exports = mongoose.model('Query', querySchema);
+module.exports = mongoose.model('Queries', querySchema);
