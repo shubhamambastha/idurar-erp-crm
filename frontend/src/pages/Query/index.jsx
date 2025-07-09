@@ -1,14 +1,29 @@
+import React, { useState } from 'react';
 import dayjs from 'dayjs';
-import { Tag } from 'antd';
+import { Tag, Button } from 'antd';
+import { CommentOutlined } from '@ant-design/icons';
 import useLanguage from '@/locale/useLanguage';
 import { useDate } from '@/settings';
 import CrudModule from '@/modules/CrudModule/CrudModule';
 import QueryForm from '@/forms/QueryForm';
+import QueryNotesModal from '@/modules/QueryModule/QueryNotesModal';
 
 export default function Query() {
   const translate = useLanguage();
   const { dateFormat } = useDate();
   const entity = 'query';
+  const [notesModalOpen, setNotesModalOpen] = useState(false);
+  const [selectedQuery, setSelectedQuery] = useState(null);
+
+  const handleNotesClick = (record) => {
+    setSelectedQuery(record);
+    setNotesModalOpen(true);
+  };
+
+  const handleNotesModalClose = () => {
+    setNotesModalOpen(false);
+    setSelectedQuery(null);
+  };
 
   const searchConfig = {
     entity: 'client',
@@ -45,6 +60,20 @@ export default function Query() {
       title: translate('Resolution'),
       dataIndex: 'resolution',
       render: (text) => text && text.length > 30 ? text.substring(0, 30) + '...' : text || 'No resolution',
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      render: (text, record) => (
+        <Button
+          type="text"
+          icon={<CommentOutlined />}
+          onClick={() => handleNotesClick(record)}
+          size="small"
+        >
+          Notes
+        </Button>
+      ),
     },
   ];
 
@@ -93,10 +122,17 @@ export default function Query() {
   };
 
   return (
-    <CrudModule
-      createForm={<QueryForm />}
-      updateForm={<QueryForm isUpdateForm={true} />}
-      config={config}
-    />
+    <>
+      <CrudModule
+        createForm={<QueryForm />}
+        updateForm={<QueryForm isUpdateForm={true} />}
+        config={config}
+      />
+      <QueryNotesModal
+        open={notesModalOpen}
+        onClose={handleNotesModalClose}
+        query={selectedQuery}
+      />
+    </>
   );
 }
