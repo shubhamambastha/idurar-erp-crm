@@ -444,6 +444,7 @@ const lang = {
   expenses: 'Expenses',
   currencies: 'Currencies',
   payments_mode: 'Payments Mode',
+  queries: 'Queries',
   account_owner: 'Account Owner',
   create_only: 'Create Only',
   enter_code: 'Enter Code',
