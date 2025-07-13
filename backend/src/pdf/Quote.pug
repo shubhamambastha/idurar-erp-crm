@@ -255,6 +255,28 @@ html
         padding: 20px 0;
         text-align: center;
       }
+
+      .summary-section {
+        margin: 20px 0;
+        padding: 15px;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 4px;
+      }
+
+      .summary-section h3 {
+        margin: 0 0 10px 0;
+        color: #0066cc;
+        font-size: 14px;
+        font-weight: bold;
+      }
+
+      .summary-text {
+        margin: 0;
+        white-space: pre-wrap;
+        line-height: 1.4;
+        color: #333;
+      }
  
   body
     
@@ -318,6 +340,13 @@ html
             tr
               td.grand.total(colspan='4')  #{translate('TOTAL')} 
               td.grand.total #{moneyFormatter({amount:model.total})}
+        
+      //- Notes Summary Section
+      if model.notesSummary
+        .col.col-24
+          .summary-section
+            h3 #{translate('Notes Summary')}
+            p.summary-text #{model.notesSummary}
         
       .col.col-24
           .space     
