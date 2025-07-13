@@ -64,7 +64,10 @@ function LoadInvoiceForm({ subTotal = 0, current = null, form = null }) {
 
       const response = await request.post({
         entity: '/invoice/generate-summary',
-        jsonData: { notes: notes },
+        jsonData: { 
+          notes: notes,
+          invoiceId: current?._id || null
+        },
       });
 
       if (response.success) {
@@ -83,10 +86,11 @@ function LoadInvoiceForm({ subTotal = 0, current = null, form = null }) {
 
   useEffect(() => {
     if (current) {
-      const { taxRate = 0, year, number } = current;
+      const { taxRate = 0, year, number, notesSummary = '' } = current;
       setTaxRate(taxRate / 100);
       setCurrentYear(year);
       setLastNumber(number);
+      setNotesSummary(notesSummary);
     }
   }, [current]);
   useEffect(() => {
