@@ -1,8 +1,11 @@
+const mongoose = require('mongoose');
 const geminiService = require('@/services/geminiService');
+
+const Model = mongoose.model('Invoice');
 
 const generateSummary = async (req, res) => {
   try {
-    const { notes } = req.body;
+    const { notes, invoiceId } = req.body;
 
     if (!notes || !Array.isArray(notes)) {
       return res.status(400).json({
@@ -14,6 +17,15 @@ const generateSummary = async (req, res) => {
     const result = await geminiService.generateNoteSummary(notes);
 
     if (result.success) {
+      // Save summary to database if invoiceId is provided
+      if (invoiceId) {
+        await Model.findOneAndUpdate(
+          { _id: invoiceId, removed: false },
+          { notesSummary: result.summary },
+          { new: true }
+        );
+      }
+
       return res.status(200).json({
         success: true,
         summary: result.summary,
