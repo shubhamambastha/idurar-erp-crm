@@ -28,11 +28,16 @@ const Item = ({ item, currentErp }) => {
   const { moneyFormatter } = useMoney();
   return (
     <Row gutter={[12, 0]} key={item._id}>
-      <Col className="gutter-row" span={11}>
+      <Col className="gutter-row" span={8}>
         <p style={{ marginBottom: 5 }}>
           <strong>{item.itemName}</strong>
         </p>
         <p>{item.description}</p>
+      </Col>
+      <Col className="gutter-row" span={5}>
+        <p style={{ color: '#666', fontSize: '12px' }}>
+          {item.notes || '-'}
+        </p>
       </Col>
       <Col className="gutter-row" span={4}>
         <p
@@ -43,7 +48,7 @@ const Item = ({ item, currentErp }) => {
           {moneyFormatter({ amount: item.price, currency_code: currentErp.currency })}
         </p>
       </Col>
-      <Col className="gutter-row" span={4}>
+      <Col className="gutter-row" span={3}>
         <p
           style={{
             textAlign: 'right',
@@ -52,7 +57,7 @@ const Item = ({ item, currentErp }) => {
           {item.quantity}
         </p>
       </Col>
-      <Col className="gutter-row" span={5}>
+      <Col className="gutter-row" span={4}>
         <p
           style={{
             textAlign: 'right',
@@ -106,7 +111,7 @@ export default function ReadItem({ config, selectedItem }) {
       if (items) {
         setItemsList(items);
         setCurrentErp(currentResult);
-      } else if (invoice.items) {
+      } else if (invoice && invoice.items) {
         setItemsList(invoice.items);
         setCurrentErp({ ...invoice.items, ...others, ...invoice });
       }
@@ -242,9 +247,14 @@ export default function ReadItem({ config, selectedItem }) {
       </Descriptions>
       <Divider />
       <Row gutter={[12, 0]}>
-        <Col className="gutter-row" span={11}>
+        <Col className="gutter-row" span={8}>
           <p>
             <strong>{translate('Product')}</strong>
+          </p>
+        </Col>
+        <Col className="gutter-row" span={5}>
+          <p>
+            <strong>{translate('Notes')}</strong>
           </p>
         </Col>
         <Col className="gutter-row" span={4}>
@@ -256,7 +266,7 @@ export default function ReadItem({ config, selectedItem }) {
             <strong>{translate('Price')}</strong>
           </p>
         </Col>
-        <Col className="gutter-row" span={4}>
+        <Col className="gutter-row" span={3}>
           <p
             style={{
               textAlign: 'right',
@@ -265,7 +275,7 @@ export default function ReadItem({ config, selectedItem }) {
             <strong>{translate('Quantity')}</strong>
           </p>
         </Col>
-        <Col className="gutter-row" span={5}>
+        <Col className="gutter-row" span={4}>
           <p
             style={{
               textAlign: 'right',
@@ -279,6 +289,29 @@ export default function ReadItem({ config, selectedItem }) {
       {itemslist.map((item) => (
         <Item key={item._id} item={item} currentErp={currentErp}></Item>
       ))}
+      
+      {currentErp.notesSummary && (
+        <>
+          <Divider />
+          <div
+            style={{
+              background: '#f5f5f5',
+              padding: '16px',
+              borderRadius: '8px',
+              border: '1px solid #d9d9d9',
+              marginBottom: '20px',
+            }}
+          >
+            <h4 style={{ margin: '0 0 12px 0', color: '#1890ff', fontSize: '16px' }}>
+              {translate('AI Generated Summary')}
+            </h4>
+            <p style={{ margin: 0, whiteSpace: 'pre-wrap', lineHeight: '1.5' }}>
+              {currentErp.notesSummary}
+            </p>
+          </div>
+        </>
+      )}
+      
       <div
         style={{
           width: '300px',
