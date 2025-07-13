@@ -335,6 +335,7 @@ module.exports = {
   add_new_lead: 'Add New Lead',
   source: 'Source',
   notes: 'Notes',
+  notes_summary: 'Notes Summary',
   new: 'New',
   in_negociation: 'In Negociation',
   won: 'Won',
