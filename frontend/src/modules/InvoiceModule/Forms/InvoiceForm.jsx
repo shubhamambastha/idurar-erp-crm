@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import dayjs from 'dayjs';
-import { Form, Input, InputNumber, Button, Select, Divider, Row, Col } from 'antd';
+import { Form, Input, InputNumber, Button, Select, Divider, Row, Col, message } from 'antd';
 
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, RobotOutlined } from '@ant-design/icons';
 
 import { DatePicker } from 'antd';
 
@@ -18,18 +18,19 @@ import useLanguage from '@/locale/useLanguage';
 import calculate from '@/utils/calculate';
 import { useSelector } from 'react-redux';
 import SelectAsync from '@/components/SelectAsync';
+import { request } from '@/request';
 
-export default function InvoiceForm({ subTotal = 0, current = null }) {
+export default function InvoiceForm({ subTotal = 0, current = null, form = null }) {
   const { last_invoice_number } = useSelector(selectFinanceSettings);
 
   if (last_invoice_number === undefined) {
     return <></>;
   }
 
-  return <LoadInvoiceForm subTotal={subTotal} current={current} />;
+  return <LoadInvoiceForm subTotal={subTotal} current={current} form={form} />;
 }
 
-function LoadInvoiceForm({ subTotal = 0, current = null }) {
+function LoadInvoiceForm({ subTotal = 0, current = null, form = null }) {
   const translate = useLanguage();
   const { dateFormat } = useDate();
   const { last_invoice_number } = useSelector(selectFinanceSettings);
@@ -38,17 +39,58 @@ function LoadInvoiceForm({ subTotal = 0, current = null }) {
   const [taxTotal, setTaxTotal] = useState(0);
   const [currentYear, setCurrentYear] = useState(() => new Date().getFullYear());
   const [lastNumber, setLastNumber] = useState(() => last_invoice_number + 1);
+  const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
+  const [notesSummary, setNotesSummary] = useState('');
 
   const handelTaxChange = (value) => {
     setTaxRate(value / 100);
   };
 
+  const generateNotesSummary = async () => {
+    if (!form) return;
+
+    try {
+      setIsGeneratingSummary(true);
+
+      const formValues = form.getFieldsValue();
+      const items = formValues.items || [];
+
+      const notes = items.map((item) => item?.notes).filter((note) => note && note.trim() !== '');
+
+      if (notes.length === 0) {
+        message.warning(translate('No notes found to generate summary'));
+        return;
+      }
+
+      const response = await request.post({
+        entity: '/invoice/generate-summary',
+        jsonData: { 
+          notes: notes,
+          invoiceId: current?._id || null
+        },
+      });
+
+      if (response.success) {
+        setNotesSummary(response.summary);
+        message.success(translate('Summary generated successfully'));
+      } else {
+        message.error(response.message || translate('Failed to generate summary'));
+      }
+    } catch (error) {
+      console.error('Error generating summary:', error);
+      message.error(translate('Error generating summary. Please try again.'));
+    } finally {
+      setIsGeneratingSummary(false);
+    }
+  };
+
   useEffect(() => {
     if (current) {
-      const { taxRate = 0, year, number } = current;
+      const { taxRate = 0, year, number, notesSummary = '' } = current;
       setTaxRate(taxRate / 100);
       setCurrentYear(year);
       setLastNumber(number);
+      setNotesSummary(notesSummary);
     }
   }, [current]);
   useEffect(() => {
@@ -213,6 +255,39 @@ function LoadInvoiceForm({ subTotal = 0, current = null }) {
           </>
         )}
       </Form.List>
+
+      <Row gutter={[12, 12]} style={{ marginTop: '16px' }}>
+        <Col span={24}>
+          <Button
+            type="primary"
+            icon={<RobotOutlined />}
+            onClick={generateNotesSummary}
+            loading={isGeneratingSummary}
+            disabled={isGeneratingSummary}
+            style={{ marginBottom: '16px' }}
+          >
+            {translate('Generate Notes Summary')}
+          </Button>
+
+          {notesSummary && (
+            <div
+              style={{
+                background: '#f5f5f5',
+                padding: '16px',
+                borderRadius: '8px',
+                border: '1px solid #d9d9d9',
+                marginBottom: '16px',
+              }}
+            >
+              <h4 style={{ margin: '0 0 8px 0', color: '#1890ff' }}>
+                {translate('AI Generated Summary')}
+              </h4>
+              <p style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{notesSummary}</p>
+            </div>
+          )}
+        </Col>
+      </Row>
+
       <Divider dashed />
       <div style={{ position: 'relative', width: ' 100%', float: 'right' }}>
         <Row gutter={[12, -5]}>
