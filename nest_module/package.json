@@ -17,7 +17,19 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "docker:build": "docker build -t idurar-nest-integration-api .",
+    "docker:build:dev": "docker build --target development -t idurar-nest-integration-api:dev .",
+    "docker:run": "docker run -p 3001:3000 --name nest-integration-api idurar-nest-integration-api",
+    "docker:run:dev": "docker run -p 3001:3000 -v $(pwd):/app -v /app/node_modules --name nest-integration-api-dev idurar-nest-integration-api:dev",
+    "docker:stop": "docker stop nest-integration-api || true && docker rm nest-integration-api || true",
+    "docker:stop:dev": "docker stop nest-integration-api-dev || true && docker rm nest-integration-api-dev || true",
+    "docker:clean": "npm run docker:stop && docker rmi idurar-nest-integration-api || true",
+    "compose:up": "docker-compose up -d",
+    "compose:up:dev": "docker-compose --profile dev up -d",
+    "compose:down": "docker-compose down",
+    "compose:logs": "docker-compose logs -f",
+    "compose:build": "docker-compose build"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
