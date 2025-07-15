@@ -43,6 +43,19 @@ services:
         condition: service_healthy
     volumes:
       - ./backend/public:/app/public
+  # React Frontend (Vite)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: idurar-frontend
+    restart: unless-stopped
+    ports:
+      - "3002:80"
+    environment:
+      VITE_BACKEND_SERVER: http://localhost:8888/
+    depends_on:
+      - backend
     networks:
       - idurar-network
     healthcheck:
