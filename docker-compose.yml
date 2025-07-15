@@ -7,8 +7,8 @@ services:
     ports:
       - "27017:27017"
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: admin123
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-admin123}
       MONGO_INITDB_DATABASE: idurar
     volumes:
       - mongodb_data:/data/db
@@ -20,7 +20,7 @@ services:
       interval: 10s
       timeout: 10s
       retries: 5
-      start_period: 40s
+      start_period: 30s
 
   # Backend API (Express.js)
   backend:
@@ -32,8 +32,8 @@ services:
     ports:
       - "8888:8888"
     environment:
-      NODE_ENV: production
-      DATABASE: mongodb://admin:admin123@mongodb:27017/idurar_erp_crm?authSource=admin
+      NODE_ENV: ${NODE_ENV:-production}
+      DATABASE: mongodb://${MONGO_USERNAME:-admin}:${MONGO_PASSWORD:-admin123}@mongodb:27017/idurar_erp_crm?authSource=admin
       PORT: 8888
       JWT_SECRET: ${JWT_SECRET:-your_private_jwt_secret_key}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-your_gemini_api_key}
@@ -42,7 +42,11 @@ services:
       mongodb:
         condition: service_healthy
     volumes:
-      - ./backend/public:/app/public
+      - ./backend:/app
+      - /app/node_modules
+    networks:
+      - idurar-network
+
   # React Frontend (Vite)
   frontend:
     build:
@@ -58,12 +62,6 @@ services:
       - backend
     networks:
       - idurar-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8888/api/ping"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 5s
 
   # Next.js Frontend
   nextjs:
@@ -75,14 +73,13 @@ services:
     ports:
       - "3000:3000"
     environment:
-      NODE_ENV: production
-      MONGODB_URI: mongodb://admin:admin123@mongodb:27017/nextjs-projects?authSource=admin
-      NEXT_PUBLIC_API_URL: http://backend:8888/api
+      NODE_ENV: ${NODE_ENV:-development}
+      MONGODB_URI: mongodb://${MONGO_USERNAME:-admin}:${MONGO_PASSWORD:-admin123}@mongodb:27017/nextjs-projects?authSource=admin
+      NEXT_PUBLIC_API_URL: http://localhost:8888/api
+      API_URL: http://backend:8888/api
     depends_on:
-      mongodb:
-        condition: service_healthy
-      backend:
-        condition: service_started
+      - mongodb
+      - backend
     networks:
       - idurar-network
 
@@ -97,27 +94,14 @@ services:
     ports:
       - "3001:3000"
     environment:
-      NODE_ENV: production
+      NODE_ENV: ${NODE_ENV:-development}
       PORT: 3000
-      DATABASE_URL: mongodb://admin:admin123@mongodb:27017/idurar?authSource=admin
-      MONGODB_URI: mongodb://admin:admin123@mongodb:27017/idurar?authSource=admin
+      DATABASE_URL: mongodb://${MONGO_USERNAME:-admin}:${MONGO_PASSWORD:-admin123}@mongodb:27017/idurar_erp_crm?authSource=admin
+      MONGODB_URI: mongodb://${MONGO_USERNAME:-admin}:${MONGO_PASSWORD:-admin123}@mongodb:27017/idurar_erp_crm?authSource=admin
     depends_on:
-      mongodb:
-        condition: service_healthy
+      - mongodb
     networks:
       - idurar-network
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "node",
-          "-e",
-          "require('http').get('http://localhost:3000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })",
-        ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 5s
 
 volumes:
   mongodb_data:
