@@ -449,7 +449,12 @@
     {
       "key": "base_url",
       "value": "http://localhost:3000",
-      "description": "Base URL for the NestJS application. Change this to match your server configuration."
+      "description": "Base URL for local development. For Docker use: http://localhost:3001"
+    },
+    {
+      "key": "docker_url",
+      "value": "http://localhost:3001",
+      "description": "Base URL when running with Docker Compose"
     }
   ],
   "event": [
