@@ -1,0 +1,502 @@
+{
+  "info": {
+    "name": "IDURAR ERP-CRM Integration API",
+    "description": "Complete API collection for testing the NestJS Integration Module with real MongoDB data",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "idurar-integration-api",
+    "version": {
+      "major": 1,
+      "minor": 0,
+      "patch": 0
+    }
+  },
+  "item": [
+    {
+      "name": "Analytics & Reports",
+      "item": [
+        {
+          "name": "Get Reports Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/integration/reports/summary",
+              "host": ["{{base_url}}"],
+              "path": ["integration", "reports", "summary"]
+            },
+            "description": "Get comprehensive summary of customers, invoices, queries, and payments data from MongoDB"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Customer Analytics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/integration/customers/analytics",
+              "host": ["{{base_url}}"],
+              "path": ["integration", "customers", "analytics"]
+            },
+            "description": "Get detailed customer analytics including demographics, top customers by revenue, and recent activity"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Invoice Metrics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/integration/invoices/metrics",
+              "host": ["{{base_url}}"],
+              "path": ["integration", "invoices", "metrics"]
+            },
+            "description": "Get invoice metrics including monthly trends, status distribution, average value, and overdue invoices"
+          },
+          "response": []
+        }
+      ],
+      "description": "Analytics and reporting endpoints for business intelligence"
+    },
+    {
+      "name": "Raw Data Access",
+      "item": [
+        {
+          "name": "Get Customers Data",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/integration/data/customers",
+              "host": ["{{base_url}}"],
+              "path": ["integration", "data", "customers"]
+            },
+            "description": "Get raw customers data from MongoDB for testing and integration"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Invoices Data",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/integration/data/invoices",
+              "host": ["{{base_url}}"],
+              "path": ["integration", "data", "invoices"]
+            },
+            "description": "Get raw invoices data from MongoDB with populated client information"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Queries Data",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/integration/data/queries",
+              "host": ["{{base_url}}"],
+              "path": ["integration", "data", "queries"]
+            },
+            "description": "Get raw queries/support tickets data from MongoDB with customer information"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Payments Data",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/integration/data/payments",
+              "host": ["{{base_url}}"],
+              "path": ["integration", "data", "payments"]
+            },
+            "description": "Get raw payments data from MongoDB with client and invoice information"
+          },
+          "response": []
+        }
+      ],
+      "description": "Direct access to raw data from MongoDB collections"
+    },
+    {
+      "name": "Data Transformation",
+      "item": [
+        {
+          "name": "Transform Customers Data - Export JSON",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sourceType\": \"customers\",\n  \"transformationType\": \"export\",\n  \"format\": \"json\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/integration/data/transform",
+              "host": ["{{base_url}}"],
+              "path": ["integration", "data", "transform"]
+            },
+            "description": "Export customers data in JSON format"
+          },
+          "response": []
+        },
+        {
+          "name": "Transform Customers Data - Export CSV",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sourceType\": \"customers\",\n  \"transformationType\": \"export\",\n  \"format\": \"csv\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/integration/data/transform",
+              "host": ["{{base_url}}"],
+              "path": ["integration", "data", "transform"]
+            },
+            "description": "Export customers data in CSV format"
+          },
+          "response": []
+        },
+        {
+          "name": "Transform Customers Data - Aggregate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sourceType\": \"customers\",\n  \"transformationType\": \"aggregate\",\n  \"format\": \"json\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/integration/data/transform",
+              "host": ["{{base_url}}"],
+              "path": ["integration", "data", "transform"]
+            },
+            "description": "Get aggregated customers data with statistics by country"
+          },
+          "response": []
+        },
+        {
+          "name": "Transform Customers Data - Normalize",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sourceType\": \"customers\",\n  \"transformationType\": \"normalize\",\n  \"format\": \"json\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/integration/data/transform",
+              "host": ["{{base_url}}"],
+              "path": ["integration", "data", "transform"]
+            },
+            "description": "Get normalized customers data with standardized field names"
+          },
+          "response": []
+        },
+        {
+          "name": "Transform Invoices Data - Export JSON",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sourceType\": \"invoices\",\n  \"transformationType\": \"export\",\n  \"format\": \"json\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/integration/data/transform",
+              "host": ["{{base_url}}"],
+              "path": ["integration", "data", "transform"]
+            },
+            "description": "Export invoices data in JSON format"
+          },
+          "response": []
+        },
+        {
+          "name": "Transform Invoices Data - Export XML",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sourceType\": \"invoices\",\n  \"transformationType\": \"export\",\n  \"format\": \"xml\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/integration/data/transform",
+              "host": ["{{base_url}}"],
+              "path": ["integration", "data", "transform"]
+            },
+            "description": "Export invoices data in XML format"
+          },
+          "response": []
+        },
+        {
+          "name": "Transform Invoices Data - Aggregate",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sourceType\": \"invoices\",\n  \"transformationType\": \"aggregate\",\n  \"format\": \"json\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/integration/data/transform",
+              "host": ["{{base_url}}"],
+              "path": ["integration", "data", "transform"]
+            },
+            "description": "Get aggregated invoices data with total amount and status breakdown"
+          },
+          "response": []
+        },
+        {
+          "name": "Transform Queries Data - Export JSON",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sourceType\": \"queries\",\n  \"transformationType\": \"export\",\n  \"format\": \"json\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/integration/data/transform",
+              "host": ["{{base_url}}"],
+              "path": ["integration", "data", "transform"]
+            },
+            "description": "Export queries/support tickets data in JSON format"
+          },
+          "response": []
+        }
+      ],
+      "description": "Data transformation endpoints supporting multiple formats (JSON, CSV, XML) and transformation types"
+    },
+    {
+      "name": "Webhook Processing",
+      "item": [
+        {
+          "name": "Process Sales Lead Webhook",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"sales_lead\",\n  \"data\": {\n    \"id\": \"lead_12345\",\n    \"name\": \"John Doe\",\n    \"email\": \"john.doe@example.com\",\n    \"phone\": \"+1234567890\",\n    \"company\": \"Example Corp\",\n    \"priority\": \"high\",\n    \"source\": \"website\"\n  },\n  \"timestamp\": \"2024-01-15T10:30:00Z\",\n  \"source\": \"crm_system\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/integration/webhook",
+              "host": ["{{base_url}}"],
+              "path": ["integration", "webhook"]
+            },
+            "description": "Process a sales lead webhook with lead information"
+          },
+          "response": []
+        },
+        {
+          "name": "Process Payment Notification Webhook",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"payment_notification\",\n  \"data\": {\n    \"paymentId\": \"pay_67890\",\n    \"invoiceId\": \"inv_12345\",\n    \"amount\": 1500.00,\n    \"currency\": \"USD\",\n    \"status\": \"completed\",\n    \"paymentMethod\": \"credit_card\",\n    \"transactionId\": \"txn_abc123\"\n  },\n  \"timestamp\": \"2024-01-15T14:45:00Z\",\n  \"source\": \"payment_gateway\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/integration/webhook",
+              "host": ["{{base_url}}"],
+              "path": ["integration", "webhook"]
+            },
+            "description": "Process a payment notification webhook"
+          },
+          "response": []
+        },
+        {
+          "name": "Process Customer Update Webhook",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"customer_update\",\n  \"data\": {\n    \"customerId\": \"cust_54321\",\n    \"fields\": [\"email\", \"address\", \"phone\"],\n    \"newEmail\": \"newemail@example.com\",\n    \"newAddress\": \"123 New Street, City, State\",\n    \"newPhone\": \"+1987654321\",\n    \"updatedBy\": \"admin_user\"\n  },\n  \"timestamp\": \"2024-01-15T16:20:00Z\",\n  \"source\": \"customer_portal\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/integration/webhook",
+              "host": ["{{base_url}}"],
+              "path": ["integration", "webhook"]
+            },
+            "description": "Process a customer update webhook"
+          },
+          "response": []
+        },
+        {
+          "name": "Process Unknown Webhook Type",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"unknown_event\",\n  \"data\": {\n    \"eventId\": \"evt_98765\",\n    \"description\": \"Test unknown event type\",\n    \"metadata\": {\n      \"source\": \"external_system\",\n      \"version\": \"1.0\"\n    }\n  },\n  \"timestamp\": \"2024-01-15T18:00:00Z\",\n  \"source\": \"external_api\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/integration/webhook",
+              "host": ["{{base_url}}"],
+              "path": ["integration", "webhook"]
+            },
+            "description": "Test webhook processing with unknown event type"
+          },
+          "response": []
+        }
+      ],
+      "description": "Webhook processing endpoints for external system integrations"
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "description": "Base URL for local development. For Docker use: http://localhost:3001"
+    },
+    {
+      "key": "docker_url",
+      "value": "http://localhost:3001",
+      "description": "Base URL when running with Docker Compose"
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Set dynamic timestamp for webhook requests",
+          "if (pm.request.body && pm.request.body.raw) {",
+          "    try {",
+          "        const body = JSON.parse(pm.request.body.raw);",
+          "        if (body.timestamp) {",
+          "            body.timestamp = new Date().toISOString();",
+          "            pm.request.body.raw = JSON.stringify(body, null, 2);",
+          "        }",
+          "    } catch (e) {",
+          "        // Ignore if not JSON",
+          "    }",
+          "}"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Basic response validation",
+          "pm.test('Status code is successful', function () {",
+          "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+          "});",
+          "",
+          "pm.test('Response has valid JSON', function () {",
+          "    pm.response.to.have.jsonBody();",
+          "});",
+          "",
+          "pm.test('Response time is acceptable', function () {",
+          "    pm.expect(pm.response.responseTime).to.be.below(5000);",
+          "});"
+        ]
+      }
+    }
+  ]
+}
