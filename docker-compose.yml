@@ -43,6 +43,12 @@ services:
       - ./backend/public:/app/public
     networks:
       - idurar-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8888/api/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
 
   # Next.js Frontend
   nextjs:
