@@ -1,0 +1,114 @@
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    container_name: idurar-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD:-admin123}
+      MONGO_INITDB_DATABASE: idurar
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+    networks:
+      - idurar-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  # Backend API (Express.js)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: idurar-backend
+    restart: unless-stopped
+    ports:
+      - "8888:8888"
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      DATABASE: mongodb://${MONGO_USERNAME:-admin}:${MONGO_PASSWORD:-admin123}@mongodb:27017/idurar_erp_crm?authSource=admin
+      PORT: 8888
+      JWT_SECRET: ${JWT_SECRET:-your_private_jwt_secret_key}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-your_gemini_api_key}
+      PUBLIC_SERVER_FILE: http://backend:8888/
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    networks:
+      - idurar-network
+
+  # React Frontend (Vite)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: idurar-frontend
+    restart: unless-stopped
+    ports:
+      - "3002:80"
+    environment:
+      VITE_BACKEND_SERVER: http://localhost:8888/
+    depends_on:
+      - backend
+    networks:
+      - idurar-network
+
+  # Next.js Frontend
+  nextjs:
+    build:
+      context: ./next_module
+      dockerfile: Dockerfile
+    container_name: idurar-nextjs
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      MONGODB_URI: mongodb://${MONGO_USERNAME:-admin}:${MONGO_PASSWORD:-admin123}@mongodb:27017/nextjs-projects?authSource=admin
+      NEXT_PUBLIC_API_URL: http://localhost:8888/api
+      API_URL: http://backend:8888/api
+    depends_on:
+      - mongodb
+      - backend
+    networks:
+      - idurar-network
+
+  # NestJS Integration API
+  nestjs:
+    build:
+      context: ./nest_module
+      dockerfile: Dockerfile
+      target: production
+    container_name: idurar-nest-integration-api
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: 3000
+      DATABASE_URL: mongodb://${MONGO_USERNAME:-admin}:${MONGO_PASSWORD:-admin123}@mongodb:27017/idurar_erp_crm?authSource=admin
+      MONGODB_URI: mongodb://${MONGO_USERNAME:-admin}:${MONGO_PASSWORD:-admin123}@mongodb:27017/idurar_erp_crm?authSource=admin
+    depends_on:
+      - mongodb
+    networks:
+      - idurar-network
+
+volumes:
+  mongodb_data:
+    driver: local
+  mongodb_config:
+    driver: local
+
+networks:
+  idurar-network:
+    driver: bridge

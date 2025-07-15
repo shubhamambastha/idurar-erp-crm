@@ -1,58 +1,34 @@
-# Use Node.js 18 Alpine as base image
-FROM node:18-alpine AS base
+# Simple Dockerfile based on actual project setup
+FROM node:20-alpine
 
-# Set working directory
 WORKDIR /app
 
-# Install dependencies needed for building
-RUN apk add --no-cache libc6-compat curl
+# Install basic dependencies
+RUN apk add --no-cache curl
 
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci --only=production && npm cache clean --force
-
-# Development stage
-FROM base AS development
-RUN npm ci
-COPY . .
-EXPOSE 8888
-CMD ["npm", "run", "start:dev"]
-
-# Production stage
-FROM node:18-alpine AS production
-
-# Create app directory
-WORKDIR /app
-
-# Create non-root user
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S expressjs -u 1001 && \
-    apk add --no-cache curl
-
-# Copy package files
-COPY package*.json ./
-
-# Install only production dependencies
-RUN npm ci --only=production && npm cache clean --force
+# Install dependencies (including dev dependencies for now)
+RUN npm install
 
 # Copy application code
-COPY --chown=expressjs:nodejs . .
+COPY . .
 
-# Create necessary directories with proper permissions
-RUN mkdir -p src/public/uploads src/public/download && \
-    chown -R expressjs:nodejs src/public
+# Copy and make entrypoint executable
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-# Change to non-root user
-USER expressjs
+# Ensure script has Unix line endings
+RUN apk add --no-cache dos2unix && \
+    dos2unix /usr/local/bin/docker-entrypoint.sh && \
+    apk del dos2unix
 
 # Expose port
 EXPOSE 8888
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:8888/api/ping || exit 1
+# Set entrypoint
+ENTRYPOINT ["/bin/sh", "/usr/local/bin/docker-entrypoint.sh"]
 
-# Start the application
-CMD ["node", "src/app.js"]
+# Command to run
+CMD ["node", "src/server.js"]
