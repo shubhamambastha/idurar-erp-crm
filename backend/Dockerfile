@@ -21,21 +21,14 @@ EXPOSE 8888
 CMD ["npm", "run", "start:dev"]
 
 # Production stage
-FROM node:18-alpine AS production
-
-# Create app directory
-WORKDIR /app
+FROM base AS production
 
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs && \
-    adduser -S expressjs -u 1001 && \
-    apk add --no-cache curl
+    adduser -S expressjs -u 1001
 
-# Copy package files
-COPY package*.json ./
-
-# Install only production dependencies
-RUN npm ci --only=production && npm cache clean --force
+# Copy node_modules from base stage
+COPY --from=base --chown=expressjs:nodejs /app/node_modules ./node_modules
 
 # Copy application code
 COPY --chown=expressjs:nodejs . .
