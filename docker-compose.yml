@@ -1,0 +1,109 @@
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    container_name: idurar-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin123
+      MONGO_INITDB_DATABASE: idurar
+    volumes:
+      - mongodb_data:/data/db
+      - mongodb_config:/data/configdb
+    networks:
+      - idurar-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+
+  # Backend API (Express.js)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: idurar-backend
+    restart: unless-stopped
+    ports:
+      - "8888:8888"
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: mongodb://admin:admin123@mongodb:27017/idurar?authSource=admin
+      MONGODB_URI: mongodb://admin:admin123@mongodb:27017/idurar?authSource=admin
+      PORT: 8888
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    volumes:
+      - ./backend/public:/app/public
+    networks:
+      - idurar-network
+
+  # Next.js Frontend
+  nextjs:
+    build:
+      context: ./next_module
+      dockerfile: Dockerfile
+    container_name: idurar-nextjs
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      MONGODB_URI: mongodb://admin:admin123@mongodb:27017/nextjs-projects?authSource=admin
+      NEXT_PUBLIC_API_URL: http://backend:8888/api
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      backend:
+        condition: service_started
+    networks:
+      - idurar-network
+
+  # NestJS Integration API
+  nestjs:
+    build:
+      context: ./nest_module
+      dockerfile: Dockerfile
+      target: production
+    container_name: idurar-nest-integration-api
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: mongodb://admin:admin123@mongodb:27017/idurar?authSource=admin
+      MONGODB_URI: mongodb://admin:admin123@mongodb:27017/idurar?authSource=admin
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    networks:
+      - idurar-network
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://localhost:3000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+volumes:
+  mongodb_data:
+    driver: local
+  mongodb_config:
+    driver: local
+
+networks:
+  idurar-network:
+    driver: bridge
