@@ -1,26 +1,42 @@
+/**
+ * StatusBadge Component
+ * 
+ * Displays a colored badge indicating the project status
+ * Uses consistent color scheme across the application
+ */
+
+import { ProjectStatus } from '@/types/project';
+import { PROJECT_STATUS_CONFIG } from '@/utils/constants';
+
 interface StatusBadgeProps {
-  status: 'active' | 'completed' | 'on-hold' | 'cancelled';
+  /** The status to display */
+  status: ProjectStatus;
+  /** Optional className for additional styling */
+  className?: string;
 }
 
-export default function StatusBadge({ status }: StatusBadgeProps) {
-  const getStatusStyles = () => {
-    switch (status) {
-      case 'active':
-        return 'bg-green-100 text-green-800 border-green-200';
-      case 'completed':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'on-hold':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'cancelled':
-        return 'bg-red-100 text-red-800 border-red-200';
-      default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
-  };
+/**
+ * Renders a status badge with appropriate colors and text
+ */
+export default function StatusBadge({ status, className = '' }: StatusBadgeProps) {
+  const config = PROJECT_STATUS_CONFIG[status];
+  
+  if (!config) {
+    // Fallback for unknown status
+    return (
+      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border bg-gray-100 text-gray-800 border-gray-200 ${className}`}>
+        {status}
+      </span>
+    );
+  }
 
   return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusStyles()}`}>
-      {status.charAt(0).toUpperCase() + status.slice(1).replace('-', ' ')}
+    <span 
+      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${config.bgColor} ${config.color} ${config.borderColor} ${className}`}
+      role="status"
+      aria-label={`Status: ${config.label}`}
+    >
+      {config.label}
     </span>
   );
 }
