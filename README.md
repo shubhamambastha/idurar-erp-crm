@@ -278,6 +278,270 @@ docker-compose exec backend npm run setup
 
 This will create the initial admin user and necessary database collections.
 
+## API Documentation & Example Requests
+
+### Authentication
+
+All Backend Express API endpoints (except login/register) require authentication token in headers:
+```bash
+Authorization: Bearer YOUR_JWT_TOKEN
+```
+
+### 1. Backend Express API Examples
+
+#### Login
+```bash
+# Login to get JWT token
+curl -X POST http://localhost:8888/api/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "admin@example.com",
+    "password": "admin123"
+  }'
+```
+
+#### Client Management
+```bash
+# Create a new client
+curl -X POST http://localhost:8888/api/client/create \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "company": "Acme Corp",
+    "name": "John Doe",
+    "email": "john@acme.com",
+    "phone": "+1234567890",
+    "address": "123 Main St",
+    "country": "USA"
+  }'
+
+# Get client by ID
+curl -X GET http://localhost:8888/api/client/read/CLIENT_ID \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+
+# List all clients with pagination
+curl -X GET "http://localhost:8888/api/client/list?page=1&items=10" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+
+# Search clients
+curl -X GET "http://localhost:8888/api/client/search?q=acme" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+#### Invoice Management
+```bash
+# Create invoice
+curl -X POST http://localhost:8888/api/invoice/create \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "client": "CLIENT_ID",
+    "number": "INV-001",
+    "date": "2024-01-15",
+    "expiredDate": "2024-02-15",
+    "items": [
+      {
+        "itemName": "Web Development",
+        "description": "Frontend development services",
+        "quantity": 1,
+        "price": 5000,
+        "amount": 5000
+      }
+    ],
+    "taxRate": 10,
+    "discount": 0,
+    "total": 5500,
+    "currency": "USD",
+    "status": "draft"
+  }'
+
+# Send invoice by email
+curl -X POST http://localhost:8888/api/invoice/mail \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "id": "INVOICE_ID",
+    "recipient": "client@example.com"
+  }'
+
+# Generate invoice summary
+curl -X POST http://localhost:8888/api/invoice/generate-summary \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "startDate": "2024-01-01",
+    "endDate": "2024-12-31"
+  }'
+```
+
+#### Quote Management
+```bash
+# Create quote
+curl -X POST http://localhost:8888/api/quote/create \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "client": "CLIENT_ID",
+    "number": "QTE-001",
+    "date": "2024-01-15",
+    "expiredDate": "2024-01-30",
+    "items": [
+      {
+        "itemName": "Consulting Services",
+        "description": "Business analysis and consulting",
+        "quantity": 10,
+        "price": 150,
+        "amount": 1500
+      }
+    ],
+    "taxRate": 10,
+    "discount": 100,
+    "total": 1550,
+    "currency": "USD",
+    "status": "draft"
+  }'
+
+# Convert quote to invoice
+curl -X GET http://localhost:8888/api/quote/convert/QUOTE_ID \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
+
+#### Payment Management
+```bash
+# Record payment
+curl -X POST http://localhost:8888/api/payment/create \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "invoice": "INVOICE_ID",
+    "client": "CLIENT_ID",
+    "amount": 1000,
+    "date": "2024-01-20",
+    "paymentMode": "PAYMENT_MODE_ID",
+    "notes": "Partial payment received"
+  }'
+```
+
+#### Settings Management
+```bash
+# Update settings by key
+curl -X PATCH http://localhost:8888/api/setting/updateBySettingKey/general_settings \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "company_name": "My Company Ltd",
+    "company_email": "info@mycompany.com",
+    "company_phone": "+1234567890"
+  }'
+
+# Upload company logo
+curl -X PATCH http://localhost:8888/api/setting/upload/company_logo \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -F "file=@/path/to/logo.png"
+```
+
+### 2. Nest.js Integration API Examples
+
+#### Reports and Analytics
+```bash
+# Get comprehensive summary
+curl -X GET http://localhost:3001/integration/reports/summary
+
+# Get customer analytics
+curl -X GET http://localhost:3001/integration/customers/analytics
+
+# Get invoice metrics
+curl -X GET http://localhost:3001/integration/invoices/metrics
+```
+
+#### Raw Data Access
+```bash
+# Get all customers
+curl -X GET http://localhost:3001/integration/data/customers
+
+# Get all invoices
+curl -X GET http://localhost:3001/integration/data/invoices
+
+# Get all payments
+curl -X GET http://localhost:3001/integration/data/payments
+```
+
+#### Data Processing
+```bash
+# Transform data (export example)
+curl -X POST http://localhost:3001/integration/data/transform \
+  -H "Content-Type: application/json" \
+  -d '{
+    "operation": "export",
+    "format": "csv",
+    "entities": ["customers", "invoices"]
+  }'
+
+# Webhook endpoint
+curl -X POST http://localhost:3001/integration/webhook \
+  -H "Content-Type: application/json" \
+  -d '{
+    "event": "invoice.created",
+    "data": {
+      "invoice_id": "INV-001",
+      "amount": 5500
+    }
+  }'
+```
+
+### 3. Next.js API Examples
+
+#### Project Management
+```bash
+# Create a new project
+curl -X POST http://localhost:3000/api/projects \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "New Website Redesign",
+    "description": "Complete redesign of company website",
+    "status": "active",
+    "dueDate": "2024-06-30"
+  }'
+
+# Get all projects with pagination
+curl -X GET "http://localhost:3000/api/projects?page=1&limit=10"
+
+# Get single project
+curl -X GET http://localhost:3000/api/projects/PROJECT_ID
+
+# Update project
+curl -X PUT http://localhost:3000/api/projects/PROJECT_ID \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Updated Project Name",
+    "status": "completed"
+  }'
+
+# Delete project
+curl -X DELETE http://localhost:3000/api/projects/PROJECT_ID
+```
+
+### Postman Collection
+
+For easier testing, import these endpoints into Postman:
+
+1. Create a new collection named "IDURAR ERP-CRM"
+2. Add environment variables:
+   - `BASE_URL_BACKEND`: `http://localhost:8888`
+   - `BASE_URL_NESTJS`: `http://localhost:3001`
+   - `BASE_URL_NEXTJS`: `http://localhost:3000`
+   - `JWT_TOKEN`: (set after login)
+
+3. Organize requests into folders:
+   - Authentication
+   - Clients
+   - Invoices
+   - Quotes
+   - Payments
+   - Settings
+   - Integration API
+   - Projects API
+
 ## Health Checks
 
 The system includes health check endpoints:
