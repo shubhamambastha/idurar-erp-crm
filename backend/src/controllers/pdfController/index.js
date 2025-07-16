@@ -1,7 +1,7 @@
 const pug = require('pug');
 const fs = require('fs');
 const moment = require('moment');
-let pdf = require('html-pdf');
+const puppeteer = require('puppeteer');
 const { listAllSettings, loadSettings } = require('@/middlewares/settings');
 const { getData } = require('@/middlewares/serverData');
 const useLanguage = require('@/locale/useLanguage');
@@ -67,16 +67,43 @@ exports.generatePdf = async (
         moment: moment,
       });
 
-      pdf
-        .create(htmlContent, {
-          format: info.format,
-          orientation: 'portrait',
-          border: '10mm',
-        })
-        .toFile(targetLocation, function (error) {
-          if (error) throw new Error(error);
-          if (callback) callback();
-        });
+      // Generate PDF using Puppeteer
+      const browser = await puppeteer.launch({
+        headless: 'new',
+        args: [
+          '--no-sandbox',
+          '--disable-setuid-sandbox',
+          '--disable-dev-shm-usage',
+          '--disable-gpu'
+        ],
+        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || puppeteer.executablePath(),
+      });
+
+      try {
+        const page = await browser.newPage();
+        await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
+        
+        // Configure PDF options
+        const pdfOptions = {
+          path: targetLocation,
+          format: info.format || 'A4',
+          printBackground: true,
+          margin: {
+            top: '10mm',
+            bottom: '10mm',
+            left: '10mm',
+            right: '10mm'
+          }
+        };
+
+        await page.pdf(pdfOptions);
+        await browser.close();
+        
+        if (callback) callback();
+      } catch (pdfError) {
+        await browser.close();
+        throw new Error(pdfError);
+      }
     }
   } catch (error) {
     throw new Error(error);
