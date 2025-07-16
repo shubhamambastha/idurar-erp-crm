@@ -116,7 +116,7 @@ PORT=3000
 1. **Clone the repository:**
 
    ```bash
-   git clone https://github.com/idurar/idurar-erp-crm.git
+   git clone https://github.com/shubhamambastha/idurar-erp-crm.git
    cd idurar-erp-crm
    ```
 
@@ -283,6 +283,7 @@ This will create the initial admin user and necessary database collections.
 ### Authentication
 
 All Backend Express API endpoints (except login/register) require authentication token in headers:
+
 ```bash
 Authorization: Bearer YOUR_JWT_TOKEN
 ```
@@ -290,6 +291,7 @@ Authorization: Bearer YOUR_JWT_TOKEN
 ### 1. Backend Express API Examples
 
 #### Login
+
 ```bash
 # Login to get JWT token
 curl -X POST http://localhost:8888/api/login \
@@ -301,6 +303,7 @@ curl -X POST http://localhost:8888/api/login \
 ```
 
 #### Client Management
+
 ```bash
 # Create a new client
 curl -X POST http://localhost:8888/api/client/create \
@@ -329,6 +332,7 @@ curl -X GET "http://localhost:8888/api/client/search?q=acme" \
 ```
 
 #### Invoice Management
+
 ```bash
 # Create invoice
 curl -X POST http://localhost:8888/api/invoice/create \
@@ -375,6 +379,7 @@ curl -X POST http://localhost:8888/api/invoice/generate-summary \
 ```
 
 #### Quote Management
+
 ```bash
 # Create quote
 curl -X POST http://localhost:8888/api/quote/create \
@@ -407,6 +412,7 @@ curl -X GET http://localhost:8888/api/quote/convert/QUOTE_ID \
 ```
 
 #### Payment Management
+
 ```bash
 # Record payment
 curl -X POST http://localhost:8888/api/payment/create \
@@ -423,6 +429,7 @@ curl -X POST http://localhost:8888/api/payment/create \
 ```
 
 #### Settings Management
+
 ```bash
 # Update settings by key
 curl -X PATCH http://localhost:8888/api/setting/updateBySettingKey/general_settings \
@@ -443,6 +450,7 @@ curl -X PATCH http://localhost:8888/api/setting/upload/company_logo \
 ### 2. Nest.js Integration API Examples
 
 #### Reports and Analytics
+
 ```bash
 # Get comprehensive summary
 curl -X GET http://localhost:3001/integration/reports/summary
@@ -455,6 +463,7 @@ curl -X GET http://localhost:3001/integration/invoices/metrics
 ```
 
 #### Raw Data Access
+
 ```bash
 # Get all customers
 curl -X GET http://localhost:3001/integration/data/customers
@@ -467,6 +476,7 @@ curl -X GET http://localhost:3001/integration/data/payments
 ```
 
 #### Data Processing
+
 ```bash
 # Transform data (export example)
 curl -X POST http://localhost:3001/integration/data/transform \
@@ -492,6 +502,7 @@ curl -X POST http://localhost:3001/integration/webhook \
 ### 3. Next.js API Examples
 
 #### Project Management
+
 ```bash
 # Create a new project
 curl -X POST http://localhost:3000/api/projects \
@@ -527,6 +538,7 @@ For easier testing, import these endpoints into Postman:
 
 1. Create a new collection named "IDURAR ERP-CRM"
 2. Add environment variables:
+
    - `BASE_URL_BACKEND`: `http://localhost:8888`
    - `BASE_URL_NESTJS`: `http://localhost:3001`
    - `BASE_URL_NEXTJS`: `http://localhost:3000`
@@ -559,8 +571,8 @@ The system includes health check endpoints:
 
 ## Support
 
-- Documentation: [https://github.com/idurar/idurar-erp-crm](https://github.com/idurar/idurar-erp-crm)
-- Issues: [https://github.com/idurar/idurar-erp-crm/issues](https://github.com/idurar/idurar-erp-crm/issues)
+- Documentation: [https://github.com/shubhamambastha/idurar-erp-crm](https://github.com/shubhamambastha/idurar-erp-crm)
+- Issues: [https://github.com/shubhamambastha/idurar-erp-crm/issues](https://github.com/shubhamambastha/idurar-erp-crm/issues)
 - Email: hello@idurarapp.com
 
 ## License
